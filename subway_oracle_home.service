@@ -1,0 +1,14 @@
+[Unit]
+Description=Subway Oracle — Home Display
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/subway_oracle/run_home.py
+WorkingDirectory=/home/pi/subway_oracle
+Restart=always
+RestartSec=10
+User=pi
+
+[Install]
+WantedBy=multi-user.target

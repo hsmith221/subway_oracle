@@ -1,0 +1,129 @@
+"""
+Renders to_work routes on Pimoroni Inky Impression 7.3" Spectra (800x480, 7 colors).
+"""
+
+import os
+from PIL import Image, ImageDraw, ImageFont
+from assets.generate_bullets import ensure_bullets, ASSETS_DIR
+
+WIDTH, HEIGHT = 800, 480
+
+MTA_GREEN  = (0,   147, 60)
+MTA_YELLOW = (252, 204, 10)
+WHITE      = (255, 255, 255)
+BLACK      = (0,   0,   0)
+DARK_GRAY  = (40,  40,  40)
+
+
+def _load_font(size, bold=False):
+    candidates = [
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf" if bold else
+        "/usr/share/fonts/dejavu/DejaVuSans.ttf",
+        "/System/Library/Fonts/Helvetica.ttc",
+        "/Library/Fonts/Arial Bold.ttf" if bold else "/Library/Fonts/Arial.ttf",
+    ]
+    for path in candidates:
+        if os.path.exists(path):
+            try:
+                return ImageFont.truetype(path, size)
+            except Exception:
+                pass
+    return ImageFont.load_default()
+
+
+def _fmt_time(dt):
+    if dt is None:
+        return "--:--"
+    return dt.strftime("%-I:%M%p").lower()
+
+
+def _draw_route_card(draw, img, x, y, w, h, route, bullet_names):
+    """Draw a single route card at position (x,y) with dimensions (w,h)."""
+    draw.rectangle([x, y, x + w, y + h], fill=WHITE, outline=DARK_GRAY, width=2)
+
+    bullet_size = 60
+    bx = x + 16
+    by = y + 16
+    for i, bname in enumerate(bullet_names):
+        bmp = Image.open(os.path.join(ASSETS_DIR, f"{bname}_bullet_large.bmp")).resize((bullet_size, bullet_size))
+        img.paste(bmp, (bx + i * (bullet_size + 8), by))
+        if i < len(bullet_names) - 1:
+            draw.text((bx + i * (bullet_size + 8) + bullet_size + 1, by + 18), "→",
+                      fill=BLACK, font=_load_font(28, bold=True))
+
+    text_y = by + bullet_size + 16
+    font_body = _load_font(26)
+    font_total = _load_font(24, bold=True)
+
+    if route["valid"]:
+        draw.text((x + 16, text_y),      f"departs {_fmt_time(route['departs_dt'])}", fill=BLACK, font=font_body)
+        draw.text((x + 16, text_y + 36), f"arrive ~{_fmt_time(route['arrives_dt'])}", fill=BLACK, font=font_body)
+        draw.text((x + 16, text_y + 72), f"total: {route['total_minutes']} min", fill=DARK_GRAY, font=font_total)
+    else:
+        draw.text((x + 16, text_y + 36), "no trains found", fill=DARK_GRAY, font=font_body)
+
+
+def render(routes, updated_at):
+    """
+    routes: output of calculate_routes("to_work")
+    updated_at: datetime of last refresh
+    Returns PIL Image (800x480, RGB)
+    """
+    ensure_bullets()
+    img = Image.new("RGB", (WIDTH, HEIGHT), (230, 230, 230))
+    draw = ImageDraw.Draw(img)
+
+    card_w = (WIDTH - 48) // 2
+    card_h = 260
+    card_y = 16
+
+    # Route A card (Q → R/W)
+    _draw_route_card(draw, img, 16, card_y, card_w, card_h, routes["route_a"], ["Q", "RW"])
+
+    # Route B card (6)
+    _draw_route_card(draw, img, 16 + card_w + 16, card_y, card_w, card_h, routes["route_b"], ["6"])
+
+    # Winner banner
+    banner_y = card_y + card_h + 16
+    banner_h = HEIGHT - banner_y - 48
+    winner = routes["winner"]
+    savings = routes["savings_minutes"]
+
+    if winner is not None:
+        banner_color = MTA_GREEN if winner == "B" else MTA_YELLOW
+        draw.rectangle([16, banner_y, WIDTH - 16, banner_y + banner_h], fill=banner_color)
+
+        winner_name = "6" if winner == "B" else "R/W → Q"
+        font_banner = _load_font(52, bold=True)
+        banner_text = f"✓  TAKE THE {winner_name}"
+        if savings and savings > 0:
+            banner_text += f"   saves you {savings} min"
+
+        text_color = WHITE if winner == "B" else BLACK
+        bbox = draw.textbbox((0, 0), banner_text, font=font_banner)
+        tw = bbox[2] - bbox[0]
+        th = bbox[3] - bbox[1]
+        tx = (WIDTH - tw) / 2
+        ty = banner_y + (banner_h - th) / 2
+        draw.text((tx, ty), banner_text, fill=text_color, font=font_banner)
+    else:
+        draw.rectangle([16, banner_y, WIDTH - 16, banner_y + banner_h], fill=DARK_GRAY)
+        draw.text((WIDTH // 2 - 100, banner_y + 20), "no service data", fill=WHITE, font=_load_font(36, bold=True))
+
+    # Footer
+    font_footer = _load_font(20)
+    draw.text((16, HEIGHT - 36), f"updated {_fmt_time(updated_at)}", fill=DARK_GRAY, font=font_footer)
+
+    return img
+
+
+def show(routes, updated_at):
+    """Render and push to physical Inky Impression display."""
+    img = render(routes, updated_at)
+
+    from inky.auto import auto
+    inky = auto(ask_user=True, verbose=True)
+    inky.set_image(img.rotate(180))  # rotate if display is mounted upside-down; remove if not
+    inky.show()
