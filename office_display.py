@@ -25,8 +25,10 @@ def _load_font(size):
     for path in [
         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
         "/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf",
-        "/System/Library/Fonts/Helvetica.ttc",
+        "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
+        "/System/Library/Fonts/Supplemental/Arial.ttf",
         "/Library/Fonts/Arial Bold.ttf",
+        "/Library/Fonts/Arial.ttf",
     ]:
         if os.path.exists(path):
             try:
@@ -117,7 +119,7 @@ def show(routes, updated_at):
     spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
     ecs = digitalio.DigitalInOut(board.CE0)
     dc = digitalio.DigitalInOut(board.D22)
-    srcs = None
+    srcs = digitalio.DigitalInOut(board.CE1)  # SRAM chip select (PID 6366 has onboard SRAM)
     rst = digitalio.DigitalInOut(board.D27)
     busy = digitalio.DigitalInOut(board.D17)
 

@@ -30,8 +30,10 @@ def _draw_bullet(label, fill, text_color, text, size):
     for font_path in [
         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
         "/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf",
-        "/System/Library/Fonts/Helvetica.ttc",
+        "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
+        "/System/Library/Fonts/Supplemental/Arial.ttf",
         "/Library/Fonts/Arial Bold.ttf",
+        "/Library/Fonts/Arial.ttf",
     ]:
         if os.path.exists(font_path):
             try:
@@ -40,7 +42,7 @@ def _draw_bullet(label, fill, text_color, text, size):
             except Exception:
                 pass
     if font is None:
-        font = ImageFont.load_default()
+        font = ImageFont.load_default(size=font_size)
 
     bbox = draw.textbbox((0, 0), text, font=font)
     tw = bbox[2] - bbox[0]

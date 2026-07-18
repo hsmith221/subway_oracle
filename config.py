@@ -25,12 +25,12 @@ STOP_77TH_6_NB = "631N"
 STOP_77TH_6_SB = "631S"
 STOP_28TH_6_SB = "634S"
 
-# Resolved at first boot by lookup_stops.py if None
-STOP_72ND_Q_SB = None   # 72nd St Q southbound (to work)
-STOP_72ND_Q_NB = None   # 72nd St Q northbound (to home)
-STOP_34TH_Q_NB = None   # 34th St Q northbound (transfer, to home)
-STOP_34TH_Q_SB = None   # 34th St Q southbound (transfer, to work) — same station, opposite platform
-STOP_34TH_RW_SB = None  # 34th St R/W southbound (to work)
-STOP_34TH_RW_NB = None  # 34th St R/W northbound (to home)
-STOP_23RD_RW_SB = None  # 23rd St R/W southbound (to work)
-STOP_23RD_RW_NB = None  # 23rd St R/W northbound (to home)
+STOP_72ND_Q_SB = "Q03S"  # 72nd St Q southbound (to work)
+STOP_72ND_Q_NB = "Q03N"  # 72nd St Q northbound (to home)
+# Q and R/W share the same platform at 34th-Herald Sq (R17)
+STOP_34TH_Q_NB = "R17N"  # 34th St Q northbound (transfer, to home)
+STOP_34TH_Q_SB = "R17S"  # 34th St Q southbound (transfer, to work)
+STOP_34TH_RW_SB = "R17S" # 34th St R/W southbound (to work)
+STOP_34TH_RW_NB = "R17N" # 34th St R/W northbound (to home)
+STOP_23RD_RW_SB = "R19S" # 23rd St R/W southbound (to work)
+STOP_23RD_RW_NB = "R19N" # 23rd St R/W northbound (to home)

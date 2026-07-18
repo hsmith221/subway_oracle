@@ -12,7 +12,7 @@ _cache = {}
 _CACHE_TTL = 30  # seconds
 
 FEED_6 = "6"
-FEED_NQR = "nqr"
+FEED_NQR = "N"  # nyct-gtfs uses line letter; N/Q/R/W share the same MTA feed
 
 RELEVANT_STOPS = {
     "to_work": {
