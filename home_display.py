@@ -124,7 +124,7 @@ def show(routes, updated_at):
     """Render and push to physical Inky Impression display."""
     img = render(routes, updated_at)
 
-    from inky.inky_uc8159 import Inky
-    inky = Inky(resolution=(800, 480))
+    from inky.inky_ac073tc1a import Inky
+    inky = Inky()
     inky.set_image(img)  # remove .rotate(180) if display is upside-down
     inky.show()
