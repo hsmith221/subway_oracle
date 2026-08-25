@@ -124,6 +124,11 @@ def show(routes, updated_at):
     """Render and push to physical Inky Impression display."""
     img = render(routes, updated_at)
 
+    # gpiodevice falsely flags GPIO8 as "in use" because spidev holds it,
+    # but spidev also handles CS automatically — gpiod doesn't need to claim it.
+    import gpiodevice
+    gpiodevice.check_pins_available = lambda *args, **kwargs: True
+
     from inky.inky_ac073tc1a import Inky
     inky = Inky()
     inky.set_image(img)  # remove .rotate(180) if display is upside-down
