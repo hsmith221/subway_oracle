@@ -120,24 +120,24 @@ def render(routes, updated_at):
     return img
 
 
-def show(routes, updated_at):
-    """Render and push to physical Inky Impression display."""
-    img = render(routes, updated_at)
+_inky = None
 
+
+def _init_inky():
+    global _inky
     import gpiod
     import spidev as _spidev
     from gpiod.line import Direction, Edge, Value
     from datetime import timedelta
     import gpiodevice
 
-    CS_PIN    = 8   # owned by spidev kernel driver — do not claim via gpiod
+    CS_PIN    = 8
     DC_PIN    = 22
     RESET_PIN = 27
     BUSY_PIN  = 17
 
-    # Claim only the pins gpiod can actually own
     chip = gpiodevice.find_chip_by_platform()
-    _lines = chip.request_lines(consumer="inky", config={
+    lines = chip.request_lines(consumer="inky", config={
         DC_PIN:    gpiod.LineSettings(direction=Direction.OUTPUT, output_value=Value.INACTIVE),
         RESET_PIN: gpiod.LineSettings(direction=Direction.OUTPUT, output_value=Value.ACTIVE),
         BUSY_PIN:  gpiod.LineSettings(direction=Direction.INPUT, edge_detection=Edge.RISING,
@@ -145,25 +145,31 @@ def show(routes, updated_at):
     })
 
     class _GPIO:
-        """GPIO wrapper — silently drops CS pin calls; spidev toggles it via hardware."""
         def set_value(self, pin, value):
             if pin != CS_PIN:
-                _lines.set_value(pin, value)
+                lines.set_value(pin, value)
         def get_value(self, pin):
-            return _lines.get_value(pin)
+            return lines.get_value(pin)
         def wait_edge_events(self, timeout=None):
-            return _lines.wait_edge_events(timeout)
+            return lines.wait_edge_events(timeout)
         def read_edge_events(self, max_events=1):
-            return _lines.read_edge_events(max_events)
+            return lines.read_edge_events(max_events)
 
     class _SpiDev(_spidev.SpiDev):
-        """SpiDev wrapper — ignores no_cs so the kernel handles CS automatically."""
         @property
         def no_cs(self): return False
         @no_cs.setter
         def no_cs(self, _): pass
 
     from inky.inky_ac073tc1a import Inky
-    inky = Inky(gpio=_GPIO(), spi_bus=_SpiDev())
-    inky.set_image(img)
-    inky.show()
+    _inky = Inky(gpio=_GPIO(), spi_bus=_SpiDev())
+
+
+def show(routes, updated_at):
+    """Render and push to physical Inky Impression display."""
+    global _inky
+    if _inky is None:
+        _init_inky()
+    img = render(routes, updated_at)
+    _inky.set_image(img)
+    _inky.show()
