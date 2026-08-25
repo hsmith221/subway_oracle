@@ -24,7 +24,8 @@ def main():
                 print(f"[{updated_at.strftime('%H:%M')}] Winner: {label}" +
                       (f" (saves {savings} min)" if savings else ""))
         except Exception as e:
-            print(f"Error: {e}")
+            import traceback
+            traceback.print_exc()
         time.sleep(config.REFRESH_INTERVAL_SECONDS)
 
 if __name__ == "__main__":
