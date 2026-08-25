@@ -73,9 +73,9 @@ def get_arrivals(direction):
     result = {}
     for stop_id in line6_stops:
         if stop_id:
-            result[stop_id] = _arrivals_at_stop(feed6, stop_id)
+            result[stop_id] = _arrivals_at_stop(feed6, stop_id, n=6)
     for stop_id in nqr_stops:
         if stop_id:
-            result[stop_id] = _arrivals_at_stop(feed_nqr, stop_id)
+            result[stop_id] = _arrivals_at_stop(feed_nqr, stop_id, n=6)
 
     return result
