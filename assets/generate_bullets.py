@@ -9,9 +9,9 @@ from PIL import Image, ImageDraw, ImageFont
 ASSETS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 BULLETS = [
-    ("6",   "#00933C", "white", "6"),
-    ("Q",   "#FCCC0A", "white", "Q"),
-    ("RW",  "#FCCC0A", "white", "R/W"),
+    ("6",   "#FCCC0A", "white", "6"),   # display maps yellow draw → green output
+    ("Q",   "#00933C", "white", "Q"),   # display maps green draw → yellow output
+    ("RW",  "#00933C", "white", "R/W"),
 ]
 
 SIZES = [

@@ -93,7 +93,7 @@ def render(routes, updated_at):
     savings = routes["savings_minutes"]
 
     if winner is not None:
-        banner_color = MTA_GREEN if winner == "B" else MTA_YELLOW
+        banner_color = MTA_YELLOW if winner == "B" else MTA_GREEN
         draw.rectangle([16, banner_y, WIDTH - 16, banner_y + banner_h], fill=banner_color)
 
         winner_name = "6" if winner == "B" else "R/W → Q"
