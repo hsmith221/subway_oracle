@@ -162,7 +162,19 @@ def _init_inky():
         def no_cs(self, _): pass
 
     from inky.inky_ac073tc1a import Inky
+    import types
     _inky = Inky(gpio=_GPIO(), spi_bus=_SpiDev())
+
+    # inky's _spi_write sends one byte at a time via xfer(), causing hardware CS
+    # to toggle between every byte. xfer2() holds CS low for the entire transfer,
+    # which is what the display expects per command.
+    def _spi_write(self, dc, values):
+        self._gpio.set_value(self.dc_pin, Value.ACTIVE if dc else Value.INACTIVE)
+        if isinstance(values, str):
+            values = [ord(c) for c in values]
+        self._spi_bus.xfer2(list(values))
+
+    _inky._spi_write = types.MethodType(_spi_write, _inky)
 
 
 def show(routes, updated_at):
