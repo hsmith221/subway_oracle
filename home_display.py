@@ -97,10 +97,18 @@ def render(routes, updated_at):
         draw.rectangle([16, banner_y, WIDTH - 16, banner_y + banner_h], fill=banner_color)
 
         winner_name = "6" if winner == "B" else "R/W → Q"
-        font_banner = _load_font(52, bold=True)
         banner_text = f"✓  TAKE THE {winner_name}"
         if savings and savings > 0:
             banner_text += f"   saves you {savings} min"
+
+        max_w = WIDTH - 64
+        font_size = 52
+        while font_size > 18:
+            font_banner = _load_font(font_size, bold=True)
+            bbox = draw.textbbox((0, 0), banner_text, font=font_banner)
+            if bbox[2] - bbox[0] <= max_w:
+                break
+            font_size -= 2
 
         text_color = WHITE if winner == "B" else BLACK
         bbox = draw.textbbox((0, 0), banner_text, font=font_banner)
