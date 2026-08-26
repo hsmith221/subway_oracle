@@ -172,7 +172,10 @@ def _init_inky():
         self._gpio.set_value(self.dc_pin, Value.ACTIVE if dc else Value.INACTIVE)
         if isinstance(values, str):
             values = [ord(c) for c in values]
-        self._spi_bus.xfer2(list(values))
+        values = list(values)
+        chunk = 4096
+        for i in range(0, len(values), chunk):
+            self._spi_bus.xfer2(values[i:i + chunk])
 
     _inky._spi_write = types.MethodType(_spi_write, _inky)
 
