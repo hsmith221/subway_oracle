@@ -194,5 +194,11 @@ def show(routes, updated_at):
     if _inky is None:
         _init_inky()
     img = render(routes, updated_at)
-    _inky.set_image(img, saturation=0.5)
+    # inky's set_image uses a Pillow internal API broken in Pillow 10+; pre-quantize
+    # to palette mode so set_image skips its own conversion entirely.
+    palette = _inky._palette_blend(0.5)
+    palette_image = Image.new("P", (1, 1))
+    palette_image.putpalette(palette + [0, 0, 0] * 248)
+    img = img.quantize(palette=palette_image, dither=0)
+    _inky.set_image(img)
     _inky.show()
