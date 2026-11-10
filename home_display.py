@@ -194,5 +194,5 @@ def show(routes, updated_at):
     if _inky is None:
         _init_inky()
     img = render(routes, updated_at)
-    _inky.set_image(img)
+    _inky.set_image(img, saturation=0.5)
     _inky.show()
