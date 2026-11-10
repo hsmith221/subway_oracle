@@ -96,7 +96,7 @@ def render(routes, updated_at):
         banner_color = MTA_YELLOW if winner == "B" else MTA_GREEN
         draw.rectangle([16, banner_y, WIDTH - 16, banner_y + banner_h], fill=banner_color)
 
-        winner_name = "6" if winner == "B" else "R/W → Q"
+        winner_name = "6" if winner == "B" else "Q → R/W"
         banner_text = f"✓  TAKE THE {winner_name}"
         if savings and savings > 0:
             banner_text += f"   saves you {savings} min"
