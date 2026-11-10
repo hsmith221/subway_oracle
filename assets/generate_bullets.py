@@ -10,8 +10,8 @@ ASSETS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 BULLETS = [
     ("6",   "#FCCC0A", "white", "6"),   # display maps yellow draw → green output
-    ("Q",   "#00933C", "white", "Q"),   # display maps green draw → yellow output
-    ("RW",  "#00933C", "white", "R/W"),
+    ("Q",   "#00933C", "black", "Q"),   # display maps green draw → yellow output
+    ("RW",  "#00933C", "black", "R/W"),
 ]
 
 SIZES = [
